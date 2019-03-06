@@ -29,27 +29,37 @@ def compile_regex():
 
 
 def search_files(regex):
-    os.chdir('/storage/')
-    os.chdir('collection1/collection__#1_usa_combos')
-
     credsFound = []
-    for top, dir, files in os.walk('.'):
+    for top, directory, files in os.walk('.'):
+        for dir in directory:
+            os.chdir(dir)
+            print('Searching in {!s}'.format(dir))
+            for top, dirtop, files in os.walk('.'):
+                files.sort()
+                for file in files:
+                    if file.endswith('txt'):
+                        print('Searching {!s}'.format(file))
+                        with open(file, 'r') as dumpFile:
+                            try:
+                                for line in dumpFile:
+                                    results = re.search(regex, line)
+                            except:
+                                pass
 
-        for file in files:
-            print('Searching {!s}'.format(file))
-            with open(file,'rt') as dumpFile:
-                for line in dumpFile:
-                    results = re.search(regex, line)
-                    if results:
-                        foundString = file + ': ' + line
-                        credsFound.append(foundString)
-
+                            if results:
+                                foundString = file + ': ' + line
+                                credsFound.append(foundString)
+                os.chdir('../')
     return credsFound
 
 
-regex = compile_regex()
-found = search_files(regex)
+if __name__ == '__main__':
+    home = '/usr/home/matt/PycharmProjects/Collection-Searcher'
+    regex = compile_regex()
+    collectionDir = '/storage/collection1'
+    os.chdir(collectionDir)
+    found = search_files(regex)
 
-with open('~/PycharmProjects/collection1/Found.txt', 'wt') as outfile:
-    for cred in found:
-        outfile.write(cred)
+    with open(home + '/found.txt', 'wt') as outfile:
+        for cred in found:
+            outfile.write(cred)
